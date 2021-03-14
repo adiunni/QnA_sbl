@@ -8,8 +8,15 @@ import Link from '@material-ui/core/Link';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import { makeStyles } from '@material-ui/core/styles';
+import {
+    BrowserRouter as Router,
+    Switch,
+    Route
+} from "react-router-dom";
 
 import Questions from './Questions';
+import Question from './Question';
+import Ask from './Ask';
 
 const useStyles = makeStyles((theme) => ({
     body: {
@@ -50,18 +57,24 @@ export default function Body() {
         <Grid item xs={1.5}>
                 <List className={classes.sidebar}>
                     <ListItem>
-                        <Button className={classes.ask}>ASK</Button>
+                        <Button className={classes.ask} href="/ask">ASK</Button>
                     </ListItem>
                     <ListItem button>
-                        <Link className={classes.link}>Questions</Link>
+                        <Link className={classes.link} href="/">Questions</Link>
                     </ListItem>
                     <ListItem button>
-                        <Link className={classes.link}>Users</Link>
+                        <Link className={classes.link} href="https://github.com/CharieBlastX7/QnA_sbl">GitHub</Link>
                     </ListItem>
                 </List>
         </Grid>
         <Grid item xs>
-          <Questions />
+            <Router>
+                <Switch>
+                    <Route path="/q/:id" component={Question} />
+                    <Route path="/ask" component={Ask} />
+                    <Route path="/" component={Questions} />
+                </Switch>
+            </Router>
         </Grid>
     </Grid>
   );

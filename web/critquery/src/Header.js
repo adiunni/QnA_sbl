@@ -8,6 +8,7 @@ import InputBase from '@material-ui/core/InputBase';
 import Paper from '@material-ui/core/Paper';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
+import Link from '@material-ui/core/Link';
 import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles((theme) => ({
@@ -67,7 +68,9 @@ export default function Header() {
   return (
     <AppBar position="static" className={classes.header}>
         <Toolbar>
-            <Avatar alt="CritQuery" src="/logo512.png" className={classes.logo} />
+            <Link href="/">
+                <Avatar alt="CritQuery" src="/logo512.png" className={classes.logo} />
+            </Link>
             <Typography variant="h5" gutterBottom className={classes.title}>CritQuery</Typography>
             <div style={{flexGrow: 1}}></div>
             <Paper component="form" className={classes.searchContainer}>
