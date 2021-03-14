@@ -17,12 +17,12 @@ import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 import IconButton from '@material-ui/core/IconButton';
 import Chip from '@material-ui/core/Chip';
 import Divider from '@material-ui/core/Divider';
-import CircularProgress from '@material-ui/core/CircularProgress';
+import Paper from '@material-ui/core/Paper';
 import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles((theme) => ({
     heading: {
-        paddingTop: 15,
+        paddingTop: 5,
         marginBottom: 20, 
         flexGrow: 1
     },
@@ -58,21 +58,35 @@ const useStyles = makeStyles((theme) => ({
         "&:hover": {
             textDecoration: 'none'
         }
+    },
+    answer: {
+
+    },
+    container: {
+        padding: 15
+    },
+    avatar: {
+        height: 40,
+        width: 40,
+        display: 'inline-block'
+    },
+    user: {
+        margin: 15,
+        maxWidth: 150,
+        padding: 5
+    },
+    username: {
+        padding: 5,
+        fontWeight: 900
     }
 }));
 
-export default function Questions(props) {
+export default function Answers(props) {
   const classes = useStyles();
 
   const [open, setOpen] = useState(false);
 
   const [choice, setChoice] = useState(1);
-
-  const [questions, setQuestions] = useState(false);
-
-  useEffect(() => {
-      fetch("https://hopefulemptytransformations.theabbie.repl.co/questions").then(x=>x.json()).then(setQuestions);
-  },[]);
 
   const handleChange = (e) => {
     setOpen(false);
@@ -87,7 +101,7 @@ export default function Questions(props) {
   return (
     <div>
         <Toolbar>
-            <Typography variant="h4" gutterBottom className={classes.heading}>Questions</Typography>
+            <Typography variant="h4" gutterBottom className={classes.heading}>Answers</Typography>
             <FormControl className={classes.formControl}>
             <InputLabel id="sort">Sort By</InputLabel>
             <Select labelId="sort" open={open} onOpen={() => setOpen(true)} onClose={handleClose} value={choice} onChange={handleChange}>
@@ -97,30 +111,36 @@ export default function Questions(props) {
             </Select>
             </FormControl>
         </Toolbar>
-        <CircularProgress style={{ display: questions?"none":"block", margin: "20px auto" }} />
         <List className={classes.list}>
-            {questions?questions.map(q => (
+            {Object.values(props.answers).map(a => (
                 <ListItem>
-                    <Grid container spacing={3} className={classes.body}>
-                        <Grid item xs={10}>
-                            <Link className={classes.link} href={"/q/"+q.id}>
-                                <Typography variant="body1" gutterBottom className={classes.question}>{q.title}</Typography>        
-                            </Link>
-                            {Object.values(q.tags).map(tag => (
-                                <Chip label={tag} variant="outlined" className={classes.tags} />
-                            ))}
+                    <Paper elevation={3} variant="outlined" className={classes.container}>
+                        <Grid container spacing={3} className={classes.body}>
+                            <Grid item xs={10}>
+                                <Typography variant="subtitle1" gutterBottom className={classes.answer}>{a.body}</Typography>
+                                <Paper elevation={3} variant="outlined" className={classes.user}>
+                                    <Grid container>
+                                        <Grid item xs={4}>
+                                            <Avatar alt="User Avatar" src={"https://avatars.dicebear.com/api/male/"+Math.random()+".png"} className={classes.avatar} />
+                                        </Grid>
+                                        <Grid xs className={classes.username}>
+                                            {a.op}
+                                        </Grid>
+                                    </Grid>
+                                </Paper>
+                            </Grid>
+                            <Grid item xs={2}>
+                                <IconButton className={classes.arrow}>
+                                    <ArrowDropUpIcon fontSize="large" />
+                                </IconButton>
+                                <IconButton className={classes.arrow}>
+                                    <ArrowDropDownIcon fontSize="large" /> 
+                                </IconButton>
+                            </Grid>
                         </Grid>
-                        <Grid item xs={2}>
-                            <IconButton className={classes.arrow}>
-                            <ArrowDropUpIcon fontSize="large" />
-                            </IconButton>
-                            <IconButton className={classes.arrow}>
-                            <ArrowDropDownIcon fontSize="large" /> 
-                            </IconButton>
-                        </Grid>
-                    </Grid>
+                    </Paper>
                 </ListItem>
-            )):""}
+            ))}
         </List>
     </div>
   );
