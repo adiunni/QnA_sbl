@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from "react";
-import ReactDOM from 'react-dom';
-import Avatar from '@material-ui/core/Avatar';
 import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
-import Button from '@material-ui/core/Button';
 import Link from '@material-ui/core/Link';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
@@ -16,9 +13,10 @@ import ArrowDropUpIcon from '@material-ui/icons/ArrowDropUp';
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 import IconButton from '@material-ui/core/IconButton';
 import Chip from '@material-ui/core/Chip';
-import Divider from '@material-ui/core/Divider';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import { makeStyles } from '@material-ui/core/styles';
+
+import timeSince from './timeSince';
 
 const useStyles = makeStyles((theme) => ({
     heading: {
@@ -71,7 +69,11 @@ export default function Questions(props) {
   const [questions, setQuestions] = useState(false);
 
   useEffect(() => {
-      fetch("https://hopefulemptytransformations.theabbie.repl.co/questions").then(x=>x.json()).then(setQuestions);
+      if (props.questions) {
+          setQuestions(props.questions);
+          return;
+      }
+      fetch("https://qna-sbl.herokuapp.com/api/q").then(x=>x.json()).then(setQuestions);
   },[]);
 
   const handleChange = (e) => {
@@ -106,9 +108,10 @@ export default function Questions(props) {
                             <Link className={classes.link} href={"/q/"+q.id}>
                                 <Typography variant="body1" gutterBottom className={classes.question}>{q.title}</Typography>        
                             </Link>
-                            {Object.values(q.tags).map(tag => (
+                            {Object.values(["tag1","tag2","tag3"]/*q.tags*/).map(tag => (
                                 <Chip label={tag} variant="outlined" className={classes.tags} />
                             ))}
+                            <Chip label={timeSince(q.updated_at) + " ago"} variant="outlined" className={classes.tags} style={{ backgroundColor: "lightgrey" }} /> 
                         </Grid>
                         <Grid item xs={2}>
                             <IconButton className={classes.arrow}>

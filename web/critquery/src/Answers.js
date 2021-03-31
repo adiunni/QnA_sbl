@@ -1,10 +1,7 @@
 import React, { useEffect, useState } from "react";
-import ReactDOM from 'react-dom';
 import Avatar from '@material-ui/core/Avatar';
 import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
-import Button from '@material-ui/core/Button';
-import Link from '@material-ui/core/Link';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -15,10 +12,12 @@ import InputLabel from '@material-ui/core/InputLabel';
 import ArrowDropUpIcon from '@material-ui/icons/ArrowDropUp';
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 import IconButton from '@material-ui/core/IconButton';
-import Chip from '@material-ui/core/Chip';
-import Divider from '@material-ui/core/Divider';
 import Paper from '@material-ui/core/Paper';
+import Link from '@material-ui/core/Link';
+import Chip from '@material-ui/core/Chip';
 import { makeStyles } from '@material-ui/core/styles';
+
+import timeSince from './timeSince';
 
 const useStyles = makeStyles((theme) => ({
     heading: {
@@ -63,7 +62,8 @@ const useStyles = makeStyles((theme) => ({
 
     },
     container: {
-        padding: 15
+        padding: 15,
+        width: "100%"
     },
     avatar: {
         height: 40,
@@ -87,6 +87,8 @@ export default function Answers(props) {
   const [open, setOpen] = useState(false);
 
   const [choice, setChoice] = useState(1);
+
+  const [avatar,setavatar] = useState(Math.random());
 
   const handleChange = (e) => {
     setOpen(false);
@@ -117,14 +119,15 @@ export default function Answers(props) {
                     <Paper elevation={3} variant="outlined" className={classes.container}>
                         <Grid container spacing={3} className={classes.body}>
                             <Grid item xs={10}>
-                                <Typography variant="subtitle1" gutterBottom className={classes.answer}>{a.body}</Typography>
+                                <Typography variant="subtitle1" gutterBottom className={classes.answer}>{a.text}</Typography>
+                                <Chip label={timeSince(a.updated_at) + " ago"} variant="outlined" className={classes.tags} style={{ backgroundColor: "lightgrey" }} />
                                 <Paper elevation={3} variant="outlined" className={classes.user}>
                                     <Grid container>
                                         <Grid item xs={4}>
-                                            <Avatar alt="User Avatar" src={"https://avatars.dicebear.com/api/male/"+Math.random()+".png"} className={classes.avatar} />
+                                            <Avatar alt="User Avatar" src={"https://avatars.dicebear.com/api/male/"+avatar+".png"} className={classes.avatar} />
                                         </Grid>
                                         <Grid xs className={classes.username}>
-                                            {a.op}
+                                            <Link href={"/u/"+a.user} className={classes.link}>{a.user}</Link>
                                         </Grid>
                                     </Grid>
                                 </Paper>

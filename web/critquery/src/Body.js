@@ -1,7 +1,4 @@
 import React, { useEffect, useState } from "react";
-import ReactDOM from 'react-dom';
-import Avatar from '@material-ui/core/Avatar';
-import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 import Link from '@material-ui/core/Link';
@@ -17,6 +14,8 @@ import {
 import Questions from './Questions';
 import Question from './Question';
 import Ask from './Ask';
+import User from './User';
+import Login from './Login';
 
 const useStyles = makeStyles((theme) => ({
     body: {
@@ -71,6 +70,8 @@ export default function Body() {
             <Router>
                 <Switch>
                     <Route path="/q/:id" component={Question} />
+                    <Route path="/u/:id" component={User} />
+                    <Route path="/login" component={Login} />
                     <Route path="/ask" component={Ask} />
                     <Route path="/" component={Questions} />
                 </Switch>

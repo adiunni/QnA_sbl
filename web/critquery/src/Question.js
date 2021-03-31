@@ -1,28 +1,20 @@
 import React, { useEffect, useState } from "react";
-import ReactDOM from 'react-dom';
 import Avatar from '@material-ui/core/Avatar';
 import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
-import Link from '@material-ui/core/Link';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import Toolbar from '@material-ui/core/Toolbar';
-import FormControl from '@material-ui/core/FormControl';
-import Select from '@material-ui/core/Select';
-import MenuItem from '@material-ui/core/MenuItem';
-import InputLabel from '@material-ui/core/InputLabel';
 import ArrowDropUpIcon from '@material-ui/icons/ArrowDropUp';
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 import IconButton from '@material-ui/core/IconButton';
 import Chip from '@material-ui/core/Chip';
-import Divider from '@material-ui/core/Divider';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Paper from '@material-ui/core/Paper';
 import TextareaAutosize from '@material-ui/core/TextareaAutosize';
+import Link from '@material-ui/core/Link';
 import { makeStyles } from '@material-ui/core/styles';
 
 import Answers from './Answers';
+import timeSince from './timeSince';
 
 const useStyles = makeStyles((theme) => ({
     container: {
@@ -91,6 +83,13 @@ const useStyles = makeStyles((theme) => ({
         "&:focus": {
             outline: 'none'
         }
+    },
+    link: {
+        textDecoration: "none",
+        color: "black",
+        '&:hover': {
+            textDecoration: "none"
+        }
     }
 }));
 
@@ -101,37 +100,58 @@ export default function Question(props) {
 
   const [answer, setAnswer] = useState(localStorage.getItem("answer") || "");
 
+  const [isloggedin,setisloggedin] = useState(localStorage.getItem("token")?true:false);
+
+  const [avatar,setavatar] = useState(Math.random());
+
   useEffect(() => {
-      fetch("https://hopefulemptytransformations.theabbie.repl.co/q/"+props.match.params.id).then(x=>x.json()).then(setQuestion);
+      fetch("https://qna-sbl.herokuapp.com/api/q/"+props.match.params.id).then(x=>x.json()).then(setQuestion);
   },[]);
+
+  function post() {
+    fetch("https://qna-sbl.herokuapp.com/api/a",{method: "POST", body: JSON.stringify({text: answer, question: props.match.params.id}), headers: {'Content-Type': "application/json", Authorization: "Token "+localStorage.getItem("token")}}).then(res => {
+        if (res.ok) {
+            return res.json();
+        }
+        else {
+          res.json().then(e => {
+              console.log(e);
+          });
+        }
+    }).then(res => {
+        setAnswer("");
+        window.location.reload();
+    });
+  }
 
   return (
     <div>
         <Grid container className={classes.container}>
             <Grid item xs>
                 <CircularProgress style={{ display: question?"none":"block", margin: "20px auto" }} />
-                <Typography variant="h4" gutterBottom className={classes.heading}>{question?question.title:""}</Typography>
-                <Typography variant="subtitle1" gutterBottom className={classes.description}>{question?question.description:""}</Typography>
-                {question?Object.values(question.tags).map(tag => (
+                <Typography variant="h4" gutterBottom className={classes.heading}>{question?question.question.title:""}</Typography>
+                <Typography variant="subtitle1" gutterBottom className={classes.description}>{question?question.question.desc:""}</Typography>
+                {/*question?Object.values(question.tags).map(tag => (
                     <Chip label={tag} variant="outlined" className={classes.tags} />
-                )):""}
+                )):""*/}
+                {question?<Chip label={timeSince(question.question.updated_at) + " ago"} variant="outlined" className={classes.tags} style={{ backgroundColor: "lightgrey" }} />:""}
                 {question?(
                     <Paper elevation={3} variant="outlined" className={classes.user}>
                         <Grid container>
                             <Grid item xs={4}>
-                                <Avatar alt="User Avatar" src={"https://avatars.dicebear.com/api/male/"+Math.random()+".png"} className={classes.avatar} />
+                                <Avatar alt="User Avatar" src={"https://avatars.dicebear.com/api/male/"+avatar+".png"} className={classes.avatar} />
                             </Grid>
                             <Grid xs className={classes.username}>
-                                {question.op}
+                                <Link href={"/u/"+question.question.user} className={classes.link}>{question.question.user}</Link>
                             </Grid>
                         </Grid>
                     </Paper>
                 ):""}
                 { window.localStorage.setItem("answer",answer) }
                 <Paper elevation={3} variant="outlined" style={{ margin: 20, maxWidth: 300, display: question?"block":"none" }}>
-                    <TextareaAutosize value={answer} onChange={ (e) => setAnswer(e.target.value) } maxLength={600} className={classes.answerBox} boxShadow={3} rowsMin={1} placeholder="Answer" />
+                    <TextareaAutosize value={answer} onChange={ (e) => setAnswer(e.target.value) } maxLength={600} className={classes.answerBox} boxShadow={3} rowsMin={1} disabled={!isloggedin} placeholder="Answer" />
                 </Paper>
-                <Button className={classes.post} style={{ display: question?"block":"none" }}>ANSWER</Button>
+                <Button className={classes.post} style={{ display: question?"block":"none" }} onClick={post} disabled={!isloggedin}>ANSWER</Button>
             </Grid>
             <Grid item xs={1} style={{ display: question?"block":"none" }}>
                 <IconButton className={classes.arrow}>
