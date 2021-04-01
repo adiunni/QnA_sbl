@@ -61,7 +61,6 @@ export default function Header() {
   const classes = useStyles();
 
   const [anchorEl, setAnchorEl] = useState(null);
-  const [avatar,setavatar] = useState(Math.random());
   const [user,setuser] = useState(localStorage.getItem("user") || "");
   const [isloggedin,setisloggedin] = useState(localStorage.getItem("token")?true:false);
 
@@ -74,7 +73,7 @@ export default function Header() {
   }
 
   function logout() {
-    fetch("https://qna-sbl.herokuapp.com/api/u/logout",{method: "POST", headers: {'Content-Type': "application/json", Authorization: "Token "+localStorage.getItem("token")}}).then(res => {
+    fetch("https://qna-sbl.herokuapp.com/api/logout",{method: "POST", headers: {'Content-Type': "application/json", Authorization: "Token "+localStorage.getItem("token")}}).then(res => {
         localStorage.removeItem("token");
         window.location.reload();
     });
@@ -91,7 +90,7 @@ export default function Header() {
             <Paper component="form" className={classes.searchContainer}>
                 <InputBase className={classes.search} placeholder="Search"/>
             </Paper>
-            <Avatar alt="User Avatar" src={"https://avatars.dicebear.com/api/male/"+avatar+".png"} className={classes.logo} onClick={showMenu} />
+            <Avatar alt="User Avatar" src={"https://avatars.dicebear.com/api/male/"+user+".png"} className={classes.logo} onClick={showMenu} />
             <Menu id="menu-appbar" onClose={closeMenu} anchorEl={anchorEl} getContentAnchorEl={null} anchorOrigin={{ vertical: "bottom", horizontal: "center" }} transformOrigin={{ vertical: "top", horizontal: "center" }} open={Boolean(anchorEl)} className={classes.menubar} >
                 <Link href="/login" className={classes.link} style={{ display: isloggedin?"none":"" }}><MenuItem>Login</MenuItem></Link>
                 <Link href={"/u/"+user} className={classes.link}><MenuItem>View Profile</MenuItem></Link>

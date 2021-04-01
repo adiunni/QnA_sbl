@@ -15,6 +15,7 @@ import IconButton from '@material-ui/core/IconButton';
 import Paper from '@material-ui/core/Paper';
 import Link from '@material-ui/core/Link';
 import Chip from '@material-ui/core/Chip';
+import DeleteIcon from '@material-ui/icons/Delete';
 import { makeStyles } from '@material-ui/core/styles';
 
 import timeSince from './timeSince';
@@ -88,7 +89,7 @@ export default function Answers(props) {
 
   const [choice, setChoice] = useState(1);
 
-  const [avatar,setavatar] = useState(Math.random());
+  const [me, setme] = useState(localStorage.getItem("user") || "");
 
   const handleChange = (e) => {
     setOpen(false);
@@ -99,6 +100,11 @@ export default function Answers(props) {
     setOpen(false);
   };
 
+  function deleteAnswer(id) {
+    fetch("https://qna-sbl.herokuapp.com/api/a/"+id,{method: "DELETE", headers: {'Content-Type': "application/json", Authorization: "Token "+localStorage.getItem("token")}}).then(res => {
+        window.location.href="/";
+    });
+  }
 
   return (
     <div>
@@ -121,10 +127,11 @@ export default function Answers(props) {
                             <Grid item xs={10}>
                                 <Typography variant="subtitle1" gutterBottom className={classes.answer}>{a.text}</Typography>
                                 <Chip label={timeSince(a.updated_at) + " ago"} variant="outlined" className={classes.tags} style={{ backgroundColor: "lightgrey" }} />
+                                {(a.user==me)?(<IconButton aria-label="delete" onClick={() => deleteAnswer(a.id)}><DeleteIcon /></IconButton>):""}
                                 <Paper elevation={3} variant="outlined" className={classes.user}>
                                     <Grid container>
                                         <Grid item xs={4}>
-                                            <Avatar alt="User Avatar" src={"https://avatars.dicebear.com/api/male/"+avatar+".png"} className={classes.avatar} />
+                                            <Avatar alt="User Avatar" src={"https://avatars.dicebear.com/api/male/"+a.user+".png"} className={classes.avatar} />
                                         </Grid>
                                         <Grid xs className={classes.username}>
                                             <Link href={"/u/"+a.user} className={classes.link}>{a.user}</Link>

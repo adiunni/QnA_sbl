@@ -11,6 +11,7 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import Paper from '@material-ui/core/Paper';
 import TextareaAutosize from '@material-ui/core/TextareaAutosize';
 import Link from '@material-ui/core/Link';
+import DeleteIcon from '@material-ui/icons/Delete';
 import { makeStyles } from '@material-ui/core/styles';
 
 import Answers from './Answers';
@@ -100,9 +101,9 @@ export default function Question(props) {
 
   const [answer, setAnswer] = useState(localStorage.getItem("answer") || "");
 
-  const [isloggedin,setisloggedin] = useState(localStorage.getItem("token")?true:false);
+  const [me, setme] = useState(localStorage.getItem("user") || "");
 
-  const [avatar,setavatar] = useState(Math.random());
+  const [isloggedin,setisloggedin] = useState(localStorage.getItem("token")?true:false);
 
   useEffect(() => {
       fetch("https://qna-sbl.herokuapp.com/api/q/"+props.match.params.id).then(x=>x.json()).then(setQuestion);
@@ -124,6 +125,12 @@ export default function Question(props) {
     });
   }
 
+  function deleteQuestion() {
+    fetch("https://qna-sbl.herokuapp.com/api/q/"+props.match.params.id,{method: "DELETE", headers: {'Content-Type': "application/json", Authorization: "Token "+localStorage.getItem("token")}}).then(res => {
+        window.location.href="/";
+    });
+  }
+
   return (
     <div>
         <Grid container className={classes.container}>
@@ -131,15 +138,16 @@ export default function Question(props) {
                 <CircularProgress style={{ display: question?"none":"block", margin: "20px auto" }} />
                 <Typography variant="h4" gutterBottom className={classes.heading}>{question?question.question.title:""}</Typography>
                 <Typography variant="subtitle1" gutterBottom className={classes.description}>{question?question.question.desc:""}</Typography>
-                {/*question?Object.values(question.tags).map(tag => (
+                {question?Object.values(question.question.tags).map(tag => (
                     <Chip label={tag} variant="outlined" className={classes.tags} />
-                )):""*/}
+                )):""}
                 {question?<Chip label={timeSince(question.question.updated_at) + " ago"} variant="outlined" className={classes.tags} style={{ backgroundColor: "lightgrey" }} />:""}
+                {(question && question.question.user==me)?(<IconButton aria-label="delete" onClick={deleteQuestion}><DeleteIcon /></IconButton>):""}
                 {question?(
                     <Paper elevation={3} variant="outlined" className={classes.user}>
                         <Grid container>
                             <Grid item xs={4}>
-                                <Avatar alt="User Avatar" src={"https://avatars.dicebear.com/api/male/"+avatar+".png"} className={classes.avatar} />
+                                <Avatar alt="User Avatar" src={"https://avatars.dicebear.com/api/male/"+question.question.user+".png"} className={classes.avatar} />
                             </Grid>
                             <Grid xs className={classes.username}>
                                 <Link href={"/u/"+question.question.user} className={classes.link}>{question.question.user}</Link>

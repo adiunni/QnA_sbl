@@ -106,9 +106,9 @@ export default function Questions(props) {
                     <Grid container spacing={3} className={classes.body}>
                         <Grid item xs={10}>
                             <Link className={classes.link} href={"/q/"+q.id}>
-                                <Typography variant="body1" gutterBottom className={classes.question}>{q.title}</Typography>        
+                                <Typography variant="h5" gutterBottom className={classes.question}>{q.title}</Typography>        
                             </Link>
-                            {Object.values(["tag1","tag2","tag3"]/*q.tags*/).map(tag => (
+                            {Object.values(q.tags).map(tag => (
                                 <Chip label={tag} variant="outlined" className={classes.tags} />
                             ))}
                             <Chip label={timeSince(q.updated_at) + " ago"} variant="outlined" className={classes.tags} style={{ backgroundColor: "lightgrey" }} /> 
