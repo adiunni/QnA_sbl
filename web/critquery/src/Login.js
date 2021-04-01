@@ -1,25 +1,10 @@
 import React, { useEffect, useState } from "react";
-import ReactDOM from 'react-dom';
-import Avatar from '@material-ui/core/Avatar';
 import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
-import Link from '@material-ui/core/Link';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
 import Toolbar from '@material-ui/core/Toolbar';
-import FormControl from '@material-ui/core/FormControl';
-import Select from '@material-ui/core/Select';
-import MenuItem from '@material-ui/core/MenuItem';
-import InputLabel from '@material-ui/core/InputLabel';
-import ArrowDropUpIcon from '@material-ui/icons/ArrowDropUp';
-import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
-import IconButton from '@material-ui/core/IconButton';
-import Chip from '@material-ui/core/Chip';
 import Divider from '@material-ui/core/Divider';
-import CircularProgress from '@material-ui/core/CircularProgress';
 import Paper from '@material-ui/core/Paper';
-import TextareaAutosize from '@material-ui/core/TextareaAutosize';
 import InputBase from '@material-ui/core/InputBase';
 import Switch from '@material-ui/core/Switch';
 import { makeStyles } from '@material-ui/core/styles';
@@ -68,7 +53,9 @@ const useStyles = makeStyles((theme) => ({
     },
     txt: {
         padding: 5,
-        color: "white"
+        color: "white",
+        marginLeft: 15,
+        marginRight: 15
     },
     txtcont: {
         margin: 25,
@@ -155,7 +142,7 @@ export default function Login(props) {
     if (!password && errctr++) throwErr("Password Required");
     console.log(errctr);
     if (errctr==0) {
-        fetch("https://qna-sbl.herokuapp.com/api/u/login",{method: "POST", body: JSON.stringify({username: username, password: password}), headers: {'Content-Type': "application/json"}}).then(res => {
+        fetch("https://qna-sbl.herokuapp.com/api/login",{method: "POST", body: JSON.stringify({username: username, password: password}), headers: {'Content-Type': "application/json"}}).then(res => {
               if (res.ok) {
                   return res.json();
               }
@@ -170,6 +157,7 @@ export default function Login(props) {
               }
           }).then(res => {
               localStorage.setItem("token",res.token);
+              localStorage.setItem("user",username);
               setmode(0);
               window.location.href="/";
           });

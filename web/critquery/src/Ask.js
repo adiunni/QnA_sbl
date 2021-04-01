@@ -55,6 +55,10 @@ export default function Ask(props) {
 
   function addTag(e) {
     if (e.charCode==13) {
+        if (tags.length == 5) {
+            throwErr("Maximum 5 Tags Allowed");
+            return;
+        }
         if (e.target.value.length==0) {
             throwErr("Tag length must be greater than 0");
             return;
@@ -74,7 +78,7 @@ export default function Ask(props) {
       if (!question && errctr++) throwErr("Title Required");
       if (!description && errctr++) throwErr("Description Required");
       if (errctr==0) {
-          fetch("https://qna-sbl.herokuapp.com/api/q",{method: "POST", body: JSON.stringify({title: question, desc: description}), headers: {'Content-Type': "application/json", Authorization: "Token "+localStorage.getItem("token")}}).then(res => {
+          fetch("https://qna-sbl.herokuapp.com/api/q",{method: "POST", body: JSON.stringify({title: question, desc: description, tags: tags}), headers: {'Content-Type': "application/json", Authorization: "Token "+localStorage.getItem("token")}}).then(res => {
             if (res.ok) {
                 return res.json();
             }
