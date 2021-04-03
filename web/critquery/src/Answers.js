@@ -16,13 +16,18 @@ import Paper from '@material-ui/core/Paper';
 import Link from '@material-ui/core/Link';
 import Chip from '@material-ui/core/Chip';
 import DeleteIcon from '@material-ui/icons/Delete';
+import Markdown from 'react-markdown';
+import SyntaxHighlighter from 'react-syntax-highlighter';
+import docco from 'react-syntax-highlighter/dist/esm/styles/hljs/docco';
 import { makeStyles } from '@material-ui/core/styles';
 
 import timeSince from './timeSince';
+import voter from './voter';
 
 const useStyles = makeStyles((theme) => ({
     heading: {
         paddingTop: 5,
+        paddingLeft: 10,
         marginBottom: 20, 
         flexGrow: 1
     },
@@ -33,7 +38,7 @@ const useStyles = makeStyles((theme) => ({
         padding: 4,
         background: '#26a69a',
         color: 'white',
-        margin: 3,
+        margin: 0,
         "&:hover": {
             background: '#26a69a'
         }
@@ -101,15 +106,28 @@ export default function Answers(props) {
   };
 
   function deleteAnswer(id) {
+    if (!window.confirm("Are you sure?")) return;
     fetch("https://qna-sbl.herokuapp.com/api/a/"+id,{method: "DELETE", headers: {'Content-Type': "application/json", Authorization: "Token "+localStorage.getItem("token")}}).then(res => {
-        window.location.href="/";
+        window.location.reload();
     });
+  }
+
+  function Image(props) {
+    return <img {...props} style={{maxWidth: '100%'}} />
+  }
+
+  function Code({language, value}) {
+    return <SyntaxHighlighter style={docco} language={language} children={value} />
+  }
+
+  function RouterLink(props) {
+    return <Link href={props.href}>{props.children}</Link>
   }
 
   return (
     <div>
         <Toolbar>
-            <Typography variant="h4" gutterBottom className={classes.heading}>Answers</Typography>
+            <Typography variant="h4" gutterBottom className={classes.heading}>{Object.values(props.answers).length} Answers</Typography>
             <FormControl className={classes.formControl}>
             <InputLabel id="sort">Sort By</InputLabel>
             <Select labelId="sort" open={open} onOpen={() => setOpen(true)} onClose={handleClose} value={choice} onChange={handleChange}>
@@ -125,25 +143,28 @@ export default function Answers(props) {
                     <Paper elevation={3} variant="outlined" className={classes.container}>
                         <Grid container spacing={3} className={classes.body}>
                             <Grid item xs={10}>
-                                <Typography variant="subtitle1" gutterBottom className={classes.answer}>{a.text}</Typography>
-                                <Chip label={timeSince(a.updated_at) + " ago"} variant="outlined" className={classes.tags} style={{ backgroundColor: "lightgrey" }} />
-                                {(a.user==me)?(<IconButton aria-label="delete" onClick={() => deleteAnswer(a.id)}><DeleteIcon /></IconButton>):""}
+                                <Markdown source={a.answer.text} renderers={{image: Image, code: Code, link: RouterLink}} />
+                                <Chip label={timeSince(a.answer.updated_at) + " ago"} variant="outlined" className={classes.tags} style={{ backgroundColor: "lightgrey" }} />
+                                {(a.answer.user==me)?(<IconButton aria-label="delete" onClick={() => deleteAnswer(a.answer.id)}><DeleteIcon /></IconButton>):""}
                                 <Paper elevation={3} variant="outlined" className={classes.user}>
                                     <Grid container>
                                         <Grid item xs={4}>
-                                            <Avatar alt="User Avatar" src={"https://avatars.dicebear.com/api/male/"+a.user+".png"} className={classes.avatar} />
+                                            <Avatar alt="User Avatar" src={"https://avatars.dicebear.com/api/male/"+a.answer.user+".png"} className={classes.avatar} />
                                         </Grid>
                                         <Grid xs className={classes.username}>
-                                            <Link href={"/u/"+a.user} className={classes.link}>{a.user}</Link>
+                                            <Link href={"/u/"+a.answer.user} className={classes.link}>{a.answer.user}</Link>
                                         </Grid>
                                     </Grid>
                                 </Paper>
                             </Grid>
                             <Grid item xs={2}>
-                                <IconButton className={classes.arrow}>
+                                <IconButton className={classes.arrow} onClick={() => voter.upvoteAnswer(a.answer.id)}>
                                     <ArrowDropUpIcon fontSize="large" />
                                 </IconButton>
-                                <IconButton className={classes.arrow}>
+                                <IconButton style={{ margin: 0 }}>
+                                    {a.sum_rating}
+                                </IconButton>
+                                <IconButton className={classes.arrow} onClick={() => voter.downvoteAnswer(a.answer.id)}>
                                     <ArrowDropDownIcon fontSize="large" /> 
                                 </IconButton>
                             </Grid>

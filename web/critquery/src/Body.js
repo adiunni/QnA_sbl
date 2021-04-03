@@ -16,6 +16,8 @@ import Question from './Question';
 import Ask from './Ask';
 import User from './User';
 import Login from './Login';
+import Users from './Users';
+import Search from './Search';
 
 const useStyles = makeStyles((theme) => ({
     body: {
@@ -62,7 +64,7 @@ export default function Body() {
                         <Link className={classes.link} href="/">Questions</Link>
                     </ListItem>
                     <ListItem button>
-                        <Link className={classes.link} href="https://github.com/CharieBlastX7/QnA_sbl">GitHub</Link>
+                        <Link className={classes.link} href="/users">Users</Link>
                     </ListItem>
                 </List>
         </Grid>
@@ -71,8 +73,10 @@ export default function Body() {
                 <Switch>
                     <Route path="/q/:id" component={Question} />
                     <Route path="/u/:id" component={User} />
+                    <Route path="/s/:query" component={Search} />
                     <Route path="/login" component={Login} />
                     <Route path="/ask" component={Ask} />
+                    <Route path="/users" component={Users} />
                     <Route path="/" component={Questions} />
                 </Switch>
             </Router>

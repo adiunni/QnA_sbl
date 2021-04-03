@@ -14,9 +14,11 @@ import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 import IconButton from '@material-ui/core/IconButton';
 import Chip from '@material-ui/core/Chip';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import Divider from '@material-ui/core/Divider';
 import { makeStyles } from '@material-ui/core/styles';
 
 import timeSince from './timeSince';
+import voter from './voter';
 
 const useStyles = makeStyles((theme) => ({
     heading: {
@@ -31,7 +33,7 @@ const useStyles = makeStyles((theme) => ({
         padding: 4,
         background: '#26a69a',
         color: 'white',
-        margin: 3,
+        margin: 0,
         "&:hover": {
             background: '#26a69a'
         }
@@ -43,7 +45,8 @@ const useStyles = makeStyles((theme) => ({
         border: '2px solid #999999',
         fontWeight: 900,
         margin: 5,
-        padding: 0
+        padding: 0,
+        cursor: "pointer"
     },
     divider: {
         background: '#BBBBBB',
@@ -56,6 +59,9 @@ const useStyles = makeStyles((theme) => ({
         "&:hover": {
             textDecoration: 'none'
         }
+    },
+    div: {
+        marginTop: 10
     }
 }));
 
@@ -102,27 +108,41 @@ export default function Questions(props) {
         <CircularProgress style={{ display: questions?"none":"block", margin: "20px auto" }} />
         <List className={classes.list}>
             {questions?questions.map(q => (
-                <ListItem>
-                    <Grid container spacing={3} className={classes.body}>
-                        <Grid item xs={10}>
-                            <Link className={classes.link} href={"/q/"+q.id}>
-                                <Typography variant="h5" gutterBottom className={classes.question}>{q.title}</Typography>        
-                            </Link>
-                            {Object.values(q.tags).map(tag => (
-                                <Chip label={tag} variant="outlined" className={classes.tags} />
-                            ))}
-                            <Chip label={timeSince(q.updated_at) + " ago"} variant="outlined" className={classes.tags} style={{ backgroundColor: "lightgrey" }} /> 
+                <div>
+                    <ListItem>
+                        <Grid container spacing={3} className={classes.body}>
+                            <Grid item xs={10}>
+                                <Link className={classes.link} href={"/q/"+q.question.id}>
+                                    <Typography variant="h5" gutterBottom className={classes.question}>{q.question.title}</Typography>        
+                                </Link>
+                                {Object.values(q.question.tags).map(tag => (
+                                    <Link href={"/s/"+tag}>
+                                        <Chip label={tag} variant="outlined" className={classes.tags} />
+                                    </Link>
+                                ))}
+                                <Chip label={timeSince(q.question.updated_at) + " ago"} variant="outlined" className={classes.tags} style={{ backgroundColor: "lightgrey" }} /> 
+                            </Grid>
+                            <Grid item xs={2}>
+                                <IconButton className={classes.arrow} onClick={() => voter.upvoteQuestion(q.question.id)}>
+                                    <ArrowDropUpIcon fontSize="large" />
+                                </IconButton>
+                                <IconButton style={{ margin: 0 }}>
+                                    {q.sum_rating}
+                                </IconButton>
+                                <IconButton className={classes.arrow} onClick={() => voter.downvoteQuestion(q.question.id)}>
+                                    <ArrowDropDownIcon fontSize="large" /> 
+                                </IconButton>
+                            </Grid>
                         </Grid>
-                        <Grid item xs={2}>
-                            <IconButton className={classes.arrow}>
-                            <ArrowDropUpIcon fontSize="large" />
-                            </IconButton>
-                            <IconButton className={classes.arrow}>
-                            <ArrowDropDownIcon fontSize="large" /> 
-                            </IconButton>
+                    </ListItem>
+                    <ListItem>
+                        <Grid container spacing={3} className={classes.body}>
+                            <Grid item xs={12}>
+                                <Divider classes={{root: classes.div}} />
+                            </Grid>
                         </Grid>
-                    </Grid>
-                </ListItem>
+                    </ListItem>
+                </div>
             )):""}
         </List>
     </div>

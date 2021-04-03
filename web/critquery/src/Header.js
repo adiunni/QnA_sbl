@@ -63,6 +63,7 @@ export default function Header() {
   const [anchorEl, setAnchorEl] = useState(null);
   const [user,setuser] = useState(localStorage.getItem("user") || "");
   const [isloggedin,setisloggedin] = useState(localStorage.getItem("token")?true:false);
+  const [query,setquery] = useState(window.location.pathname.startsWith("/s/")?decodeURIComponent(window.location.pathname.substring(3)):"");
 
   function showMenu(e) {
       setAnchorEl(e.currentTarget);
@@ -75,8 +76,13 @@ export default function Header() {
   function logout() {
     fetch("https://qna-sbl.herokuapp.com/api/logout",{method: "POST", headers: {'Content-Type': "application/json", Authorization: "Token "+localStorage.getItem("token")}}).then(res => {
         localStorage.removeItem("token");
+        localStorage.removeItem("user");
         window.location.reload();
     });
+  }
+
+  function dosearch(e) {
+    if (e.keyCode==13) window.location.href="/s/"+e.target.value;
   }
 
   return (
@@ -87,15 +93,16 @@ export default function Header() {
             </Link>
             <Typography variant="h5" gutterBottom className={classes.title}>CritQuery</Typography>
             <div style={{flexGrow: 1}}></div>
-            <Paper component="form" className={classes.searchContainer}>
-                <InputBase className={classes.search} placeholder="Search"/>
+            <Paper className={classes.searchContainer}>
+                <InputBase value={query} onChange={e=>setquery(e.target.value)} onKeyDown={dosearch} className={classes.search} placeholder="Search"/>
             </Paper>
             <Avatar alt="User Avatar" src={"https://avatars.dicebear.com/api/male/"+user+".png"} className={classes.logo} onClick={showMenu} />
             <Menu id="menu-appbar" onClose={closeMenu} anchorEl={anchorEl} getContentAnchorEl={null} anchorOrigin={{ vertical: "bottom", horizontal: "center" }} transformOrigin={{ vertical: "top", horizontal: "center" }} open={Boolean(anchorEl)} className={classes.menubar} >
                 <Link href="/login" className={classes.link} style={{ display: isloggedin?"none":"" }}><MenuItem>Login</MenuItem></Link>
-                <Link href={"/u/"+user} className={classes.link}><MenuItem>View Profile</MenuItem></Link>
-                <MenuItem>Settings</MenuItem>
+                <Link href={"/u/"+user} className={classes.link} style={{ display: isloggedin?"":"none" }}><MenuItem>View Profile</MenuItem></Link>
+                <MenuItem style={{ display: isloggedin?"":"none" }}>Settings</MenuItem>
                 <MenuItem style={{ display: isloggedin?"":"none" }} onClick={logout}>Log out</MenuItem>
+                <Link href="https://github.com/CharieBlastX7/QnA_sbl" className={classes.link}><MenuItem>GitHub</MenuItem></Link>
             </Menu>
         </Toolbar>
     </AppBar>

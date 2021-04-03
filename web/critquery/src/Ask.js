@@ -6,6 +6,7 @@ import Chip from '@material-ui/core/Chip';
 import Paper from '@material-ui/core/Paper';
 import TextareaAutosize from '@material-ui/core/TextareaAutosize';
 import InputBase from '@material-ui/core/InputBase';
+import {Helmet} from "react-helmet";
 import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles((theme) => ({
@@ -104,6 +105,9 @@ export default function Ask(props) {
   return (
     <Grid container xs={10} className={classes.container}>
         <Grid item xs>
+            <Helmet>
+                <title>Ask Question</title>
+            </Helmet>
             <Typography variant="h4" gutterBottom className={classes.heading}>Ask Question</Typography>
             <Paper elevation={3} variant="outlined" className={classes.container}>
                 <Paper elevation={3} variant="outlined" style={{ margin: 20, maxWidth: 400 }}>
