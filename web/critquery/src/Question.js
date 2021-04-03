@@ -12,10 +12,15 @@ import Paper from '@material-ui/core/Paper';
 import TextareaAutosize from '@material-ui/core/TextareaAutosize';
 import Link from '@material-ui/core/Link';
 import DeleteIcon from '@material-ui/icons/Delete';
+import Markdown from 'react-markdown';
+import SyntaxHighlighter from 'react-syntax-highlighter';
+import docco from 'react-syntax-highlighter/dist/esm/styles/hljs/docco';
+import {Helmet} from "react-helmet";
 import { makeStyles } from '@material-ui/core/styles';
 
 import Answers from './Answers';
 import timeSince from './timeSince';
+import voter from './voter';
 
 const useStyles = makeStyles((theme) => ({
     container: {
@@ -31,7 +36,7 @@ const useStyles = makeStyles((theme) => ({
         padding: 4,
         background: '#26a69a',
         color: 'white',
-        margin: 3,
+        margin: 0,
         "&:hover": {
             background: '#26a69a'
         }
@@ -106,7 +111,10 @@ export default function Question(props) {
   const [isloggedin,setisloggedin] = useState(localStorage.getItem("token")?true:false);
 
   useEffect(() => {
-      fetch("https://qna-sbl.herokuapp.com/api/q/"+props.match.params.id).then(x=>x.json()).then(setQuestion);
+      fetch("https://qna-sbl.herokuapp.com/api/q/"+props.match.params.id).then(x=>{ 
+        if (!x.ok) window.location.href="/";
+        return x.json()
+      }).then(setQuestion);
   },[]);
 
   function post() {
@@ -126,18 +134,34 @@ export default function Question(props) {
   }
 
   function deleteQuestion() {
+    if (!window.confirm("Are you sure?")) return;
     fetch("https://qna-sbl.herokuapp.com/api/q/"+props.match.params.id,{method: "DELETE", headers: {'Content-Type': "application/json", Authorization: "Token "+localStorage.getItem("token")}}).then(res => {
         window.location.href="/";
     });
   }
 
+  function Image(props) {
+    return <img {...props} style={{maxWidth: '100%'}} />
+  }
+
+  function Code({language, value}) {
+    return <SyntaxHighlighter style={docco} language={language} children={value} />
+  }
+
+  function RouterLink(props) {
+    return <Link to={props.href}>{props.children}</Link>
+  }
+
   return (
     <div>
+        <Helmet>
+            <title>{ question?question.question.title:"CritQuery - Where Curiosity Ends" }</title>
+        </Helmet>
         <Grid container className={classes.container}>
             <Grid item xs>
                 <CircularProgress style={{ display: question?"none":"block", margin: "20px auto" }} />
                 <Typography variant="h4" gutterBottom className={classes.heading}>{question?question.question.title:""}</Typography>
-                <Typography variant="subtitle1" gutterBottom className={classes.description}>{question?question.question.desc:""}</Typography>
+                <Markdown source={question?question.question.desc:""} renderers={{image: Image, code: Code, link: RouterLink}} />
                 {question?Object.values(question.question.tags).map(tag => (
                     <Chip label={tag} variant="outlined" className={classes.tags} />
                 )):""}
@@ -157,15 +181,18 @@ export default function Question(props) {
                 ):""}
                 { window.localStorage.setItem("answer",answer) }
                 <Paper elevation={3} variant="outlined" style={{ margin: 20, maxWidth: 300, display: question?"block":"none" }}>
-                    <TextareaAutosize value={answer} onChange={ (e) => setAnswer(e.target.value) } maxLength={600} className={classes.answerBox} boxShadow={3} rowsMin={1} disabled={!isloggedin} placeholder="Answer" />
+                    <TextareaAutosize value={answer} onChange={ (e) => setAnswer(e.target.value) } maxLength={30000} className={classes.answerBox} boxShadow={3} rowsMin={1} disabled={!isloggedin} placeholder="Answer" />
                 </Paper>
                 <Button className={classes.post} style={{ display: question?"block":"none" }} onClick={post} disabled={!isloggedin}>ANSWER</Button>
             </Grid>
-            <Grid item xs={1} style={{ display: question?"block":"none" }}>
-                <IconButton className={classes.arrow}>
+            <Grid item xs={1.5} style={{ display: question?"block":"none" }}>
+                <IconButton className={classes.arrow} onClick={() => voter.upvoteQuestion(question?question.question.id:"")}>
                     <ArrowDropUpIcon fontSize="large" />
                 </IconButton>
-                <IconButton className={classes.arrow}>
+                <IconButton style={{ margin: 0 }}>
+                    {question?question.sum_rating:""}
+                </IconButton>
+                <IconButton className={classes.arrow} onClick={() => voter.dowvoteQuestion(question?question.question.id:"")}>
                     <ArrowDropDownIcon fontSize="large" /> 
                 </IconButton>
             </Grid>

@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from "react";
-import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
-import Toolbar from '@material-ui/core/Toolbar';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import Paper from '@material-ui/core/Paper';
 import {Helmet} from "react-helmet";
 import { makeStyles } from '@material-ui/core/styles';
 
@@ -81,42 +78,30 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-export default function User(props) {
+export default function Search(props) {
   const classes = useStyles();
 
-  const [userdetails, setuserdetails] = useState(null);
+  const [query,setquery] = useState(props.match.params.query);
+  const [results,setresults] = useState(null);
 
   useEffect(() => {
-      fetch("https://qna-sbl.herokuapp.com/api/u/"+props.match.params.id).then(x=>{
+      fetch("https://qna-sbl.herokuapp.com/api/q/search?q="+props.match.params.query).then(x=>{
           if (!x.ok) window.location.href="/";
           return x.json()
-      }).then(setuserdetails);
+      }).then(r=>{
+          setresults(r.map(q=>({question: q, likes: 0, dislikes: 0, sum_rating: 0})));
+      });
   },[]);
 
   return (
-    <div>
         <Grid container className={classes.container}>
             <Grid item xs={12}>
                 <Helmet>
-                    <title>{ userdetails?(userdetails.user.first_name+" "+userdetails.user.last_name+" (@"+userdetails.user.username+")"):"CritQuery - Where Curiosity Ends" }</title>
+                    <title>Search Results For {query}</title>
                 </Helmet>
-                <CircularProgress style={{ display: userdetails?"none":"block", margin: "20px auto" }} />
-                <Toolbar>
-                    <Typography variant="h4" className={classes.username}>{userdetails?userdetails.user.username:""}</Typography>
-                    <Paper elevation={3} variant="outlined">
-                        <img alt="User Avatar" style={{ display: userdetails?"block":"none" }} src={"https://avatars.dicebear.com/api/male/"+(userdetails?userdetails.user.username:"")+".png"} className={classes.avatar} />
-                    </Paper>
-                </Toolbar>
-                <Toolbar>
-                    {userdetails?userdetails.user.first_name+" "+userdetails.user.last_name:""}
-                </Toolbar>
+                <CircularProgress style={{ display: results?"none":"block", margin: "20px auto" }} />
+                {results?<Questions questions={results} />:""}
             </Grid>
         </Grid>
-        <Grid container className={classes.container}>
-            <Grid item xs={12}>
-                {userdetails?<Questions questions={userdetails.questions} />:""} 
-            </Grid>
-        </Grid>
-    </div>
   );
 }
