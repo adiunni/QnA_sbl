@@ -43,10 +43,22 @@ class UserDetail(APIView):
         user = self.get_object(pk)
         serializer = RegisterSerializer(user)
         questions = user.question_set.all()
-        questions_serializer = QuestionSerializer(questions, many=True)
+        qs = []
+        for q in questions:
+            likes = q.votes.likes().count()
+            dislikes = q.votes.dislikes().count()
+            sum_rating = q.votes.sum_rating()
+            d = {
+                "likes": likes,
+                "dislikes": dislikes,
+                "sum_rating": sum_rating,
+                "question": QuestionSerializer(q).data
+            }
+            qs.append(d)
+        # questions_serializer = QuestionSerializer(questions, many=True)
         data = {
             "user": serializer.data,
-            "questions": questions_serializer.data
+            "questions": qs
         }
         return Response(data)
 
@@ -67,10 +79,22 @@ class UserQuestion(APIView):
         user = self.get_object(pk)
         serializer = RegisterSerializer(user)
         questions = user.question_set.all()
-        questions_serializer = QuestionSerializer(questions, many=True)
+        qs = []
+        for q in questions:
+            likes = q.votes.likes().count()
+            dislikes = q.votes.dislikes().count()
+            sum_rating = q.votes.sum_rating()
+            d = {
+                "likes": likes,
+                "dislikes": dislikes,
+                "sum_rating": sum_rating,
+                "question": QuestionSerializer(q).data
+            }
+            qs.append(d)
+        # questions_serializer = QuestionSerializer(questions, many=True)
         data = {
             "user": serializer.data,
-            "questions": questions_serializer.data
+            "questions": qs
         }
         
         return Response(data)

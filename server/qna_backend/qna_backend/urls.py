@@ -9,5 +9,6 @@ urlpatterns = [
     path('', include('qa.urls')),
     path('api/logout', Logout.as_view(), name='logout'),
     path('api/login', views.obtain_auth_token, name='api-auth-token'),
+    path('', include('likesdislikes.urls', namespace='likesdislikes')),
     path('', include('cauth.urls')),
 ]
