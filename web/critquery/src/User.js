@@ -104,7 +104,7 @@ export default function User(props) {
                 <Toolbar>
                     <Typography variant="h4" className={classes.username}>{userdetails?userdetails.user.username:""}</Typography>
                     <Paper elevation={3} variant="outlined">
-                        <img alt="User Avatar" style={{ display: userdetails?"block":"none" }} src={"https://avatars.dicebear.com/api/male/"+(userdetails?userdetails.user.username:"")+".png"} className={classes.avatar} />
+                        <img alt="User Avatar" style={{ display: userdetails?"block":"none" }} src={"https://avatars.dicebear.com/api/male/"+(userdetails?userdetails.user.username:"")+".svg"} className={classes.avatar} />
                     </Paper>
                 </Toolbar>
                 <Toolbar>

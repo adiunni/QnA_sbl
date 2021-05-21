@@ -98,8 +98,37 @@ export default function Ask(props) {
       }
   }
 
+  function update() {
+    var errctr = 0;
+    if (!question && errctr++) throwErr("Title Required");
+    if (!description && errctr++) throwErr("Description Required");
+    if (errctr==0) {
+        fetch("https://qna-sbl.herokuapp.com/api/q/"+props.id,{method: "PUT", body: JSON.stringify({title: question, desc: description, tags: tags}), headers: {'Content-Type': "application/json", Authorization: "Token "+localStorage.getItem("token")}}).then(res => {
+          if (res.ok) {
+              return res.json();
+          }
+          else {
+            res.json().then(e => {
+                for (var x in e) {
+                    for (var y in e[x]) {
+                        throwErr(x+": "+e[x][y]);
+                    }
+                }
+            });
+          }
+      }).then(res => {
+          window.location.reload();
+      });
+    }
+  }
+
   useEffect(() => {
       if (!isloggedin) window.location.href="/login";
+      if (props.update) {
+          setQuestion(props.question);
+          setDescription(props.description);
+          setTags(props.tags);
+      }
   },[]);
 
   return (
@@ -108,16 +137,16 @@ export default function Ask(props) {
             <Helmet>
                 <title>Ask Question</title>
             </Helmet>
-            <Typography variant="h4" gutterBottom className={classes.heading}>Ask Question</Typography>
+            <Typography variant="h4" gutterBottom className={classes.heading}>{props.update?"Update":"Ask"} Question</Typography>
             <Paper elevation={3} variant="outlined" className={classes.container}>
                 <Paper elevation={3} variant="outlined" style={{ margin: 20, maxWidth: 400 }}>
-                    <InputBase value={question} onChange={ (e) => setQuestion(e.target.value) } inputProps={{maxLength :150}} className={classes.question} placeholder="Question" />
+                    <InputBase value={question} onChange={ (e) => setQuestion(e.target.value) } inputProps={{maxLength :150}} className={classes.question} placeholder="Question (MAX 150 Characters)" />
                 </Paper>
                 <Paper elevation={3} variant="outlined" style={{ margin: 20, maxWidth: 400 }}>
                     <TextareaAutosize value={description} onChange={ (e) => setDescription(e.target.value) } maxLength={30000} className={classes.question} boxShadow={3} rowsMin={6} placeholder="Description" />
                 </Paper>
                 <Paper elevation={3} variant="outlined" style={{ margin: 20, maxWidth: 400 }}>
-                    <InputBase onKeyPress={addTag} className={classes.question} inputProps={{maxLength :20}} placeholder="Tags" />
+                    <InputBase onKeyPress={addTag} className={classes.question} inputProps={{maxLength :20}} placeholder="Tags (Press Enter to add, MAX 5))" />
                 </Paper>
                 <Paper elevation={3} variant="outlined" style={{ margin: 20, maxWidth: 400 }}>
                     {tags.map(tag => (
@@ -127,7 +156,7 @@ export default function Ask(props) {
                 <Paper elevation={3} variant="outlined" style={{ margin: 20, maxWidth: 400, background: 'rgba(255,0,0,0.1)', color: 'red', padding: 10, display: err.length>0?"block":"none" }}>
                     <ul>{err.map(e=><li>{e}</li>)}</ul>
                 </Paper>
-                <Button className={classes.post} onClick={post}>POST</Button>
+                <Button className={classes.post} onClick={props.update?update:post}>{props.update?"UPDATE":"POST"}</Button>
             </Paper>
         </Grid>
     </Grid>

@@ -96,11 +96,11 @@ export default function Header() {
             <Paper className={classes.searchContainer}>
                 <InputBase value={query} onChange={e=>setquery(e.target.value)} onKeyDown={dosearch} className={classes.search} placeholder="Search"/>
             </Paper>
-            <Avatar alt="User Avatar" src={"https://avatars.dicebear.com/api/male/"+user+".png"} className={classes.logo} onClick={showMenu} />
+            <Avatar alt="User Avatar" src={"https://avatars.dicebear.com/api/male/"+user+".svg"} className={classes.logo} onClick={showMenu} />
             <Menu id="menu-appbar" onClose={closeMenu} anchorEl={anchorEl} getContentAnchorEl={null} anchorOrigin={{ vertical: "bottom", horizontal: "center" }} transformOrigin={{ vertical: "top", horizontal: "center" }} open={Boolean(anchorEl)} className={classes.menubar} >
                 <Link href="/login" className={classes.link} style={{ display: isloggedin?"none":"" }}><MenuItem>Login</MenuItem></Link>
                 <Link href={"/u/"+user} className={classes.link} style={{ display: isloggedin?"":"none" }}><MenuItem>View Profile</MenuItem></Link>
-                <MenuItem style={{ display: isloggedin?"":"none" }}>Settings</MenuItem>
+                <Link href="/settings" className={classes.link} style={{ display: isloggedin?"":"none" }}><MenuItem style={{ display: isloggedin?"":"none" }}>Settings</MenuItem></Link>
                 <MenuItem style={{ display: isloggedin?"":"none" }} onClick={logout}>Log out</MenuItem>
                 <Link href="https://github.com/CharieBlastX7/QnA_sbl" className={classes.link}><MenuItem>GitHub</MenuItem></Link>
             </Menu>
