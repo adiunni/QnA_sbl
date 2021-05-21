@@ -15,6 +15,7 @@ import IconButton from '@material-ui/core/IconButton';
 import Chip from '@material-ui/core/Chip';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Divider from '@material-ui/core/Divider';
+import Button from '@material-ui/core/Button';
 import { makeStyles } from '@material-ui/core/styles';
 
 import timeSince from './timeSince';
@@ -62,6 +63,16 @@ const useStyles = makeStyles((theme) => ({
     },
     div: {
         marginTop: 10
+    },
+    more: {
+        background: '#26a69a',
+        color: 'white',
+        textShadow: '1px 0 white',
+        letterSpacing: 3,
+        fontWeight: 700,
+        "&:hover": {
+            background: '#26a69a'
+        }
     }
 }));
 
@@ -70,17 +81,30 @@ export default function Questions(props) {
 
   const [open, setOpen] = useState(false);
 
-  const [choice, setChoice] = useState(1);
+  const [choice, setChoice] = useState("newest");
 
   const [questions, setQuestions] = useState(false);
+
+  const [next,setnext] = useState(null);
 
   useEffect(() => {
       if (props.questions) {
           setQuestions(props.questions);
           return;
       }
-      fetch("https://qna-sbl.herokuapp.com/api/q").then(x=>x.json()).then(setQuestions);
-  },[]);
+      fetch("https://qna-sbl.herokuapp.com/api/q?sort="+choice+"&limit=5").then(x=>x.json()).then(qst=>{
+          setQuestions(qst.results);
+          setnext(qst.next);
+      });
+  },[choice]);
+
+  function loadMore() {
+    if (next == null) return;
+    fetch(next).then(x=>x.json()).then(qst=>{
+        setQuestions(q=>[...q, ...qst.results]);
+        setnext(qst.next);
+    });
+  }
 
   const handleChange = (e) => {
     setOpen(false);
@@ -91,7 +115,6 @@ export default function Questions(props) {
     setOpen(false);
   };
 
-
   return (
     <div>
         <Toolbar>
@@ -99,9 +122,9 @@ export default function Questions(props) {
             <FormControl className={classes.formControl}>
             <InputLabel id="sort">Sort By</InputLabel>
             <Select labelId="sort" open={open} onOpen={() => setOpen(true)} onClose={handleClose} value={choice} onChange={handleChange}>
-                <MenuItem value={0}>Votes</MenuItem>
-                <MenuItem value={1}>Newest</MenuItem>
-                <MenuItem value={2}>Oldest</MenuItem>
+                <MenuItem value="votes">Votes</MenuItem>
+                <MenuItem value="newest">Newest</MenuItem>
+                <MenuItem value="oldest">Oldest</MenuItem>
             </Select>
             </FormControl>
         </Toolbar>
@@ -120,7 +143,7 @@ export default function Questions(props) {
                                         <Chip label={tag} variant="outlined" className={classes.tags} />
                                     </Link>
                                 ))}
-                                <Chip label={timeSince(q.question.updated_at) + " ago"} variant="outlined" className={classes.tags} style={{ backgroundColor: "lightgrey" }} /> 
+                                <Chip label={timeSince(q.question.updated_at) + " ago"} variant="outlined" className={classes.tags} style={{ backgroundColor: "lightgrey", cursor: "default" }} /> 
                             </Grid>
                             <Grid item xs={2}>
                                 <IconButton className={classes.arrow} onClick={() => voter.upvoteQuestion(q.question.id)}>
@@ -145,6 +168,10 @@ export default function Questions(props) {
                 </div>
             )):""}
         </List>
+        <Toolbar>
+            <div style={{ flexGrow: 1 }} />
+            <Button className={classes.more} onClick={loadMore} disabled={!next} style={{ display: questions?"block":"none" }}>More</Button>
+        </Toolbar>
     </div>
   );
 }

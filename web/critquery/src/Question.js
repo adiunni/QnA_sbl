@@ -12,6 +12,7 @@ import Paper from '@material-ui/core/Paper';
 import TextareaAutosize from '@material-ui/core/TextareaAutosize';
 import Link from '@material-ui/core/Link';
 import DeleteIcon from '@material-ui/icons/Delete';
+import EditIcon from '@material-ui/icons/Edit';
 import Markdown from 'react-markdown';
 import SyntaxHighlighter from 'react-syntax-highlighter';
 import docco from 'react-syntax-highlighter/dist/esm/styles/hljs/docco';
@@ -19,6 +20,7 @@ import {Helmet} from "react-helmet";
 import { makeStyles } from '@material-ui/core/styles';
 
 import Answers from './Answers';
+import Ask from './Ask';
 import timeSince from './timeSince';
 import voter from './voter';
 
@@ -48,7 +50,8 @@ const useStyles = makeStyles((theme) => ({
         border: '2px solid #999999',
         fontWeight: 900,
         margin: 5,
-        padding: 0
+        padding: 0,
+        cursor: "pointer"
     },
     divider: {
         background: '#BBBBBB',
@@ -108,6 +111,8 @@ export default function Question(props) {
 
   const [me, setme] = useState(localStorage.getItem("user") || "");
 
+  const [edit,setedit] = useState(false);
+
   const [isloggedin,setisloggedin] = useState(localStorage.getItem("token")?true:false);
 
   useEffect(() => {
@@ -149,7 +154,7 @@ export default function Question(props) {
   }
 
   function RouterLink(props) {
-    return <Link to={props.href}>{props.children}</Link>
+    return <Link href={props.href}>{props.children}</Link>
   }
 
   return (
@@ -160,18 +165,21 @@ export default function Question(props) {
         <Grid container className={classes.container}>
             <Grid item xs>
                 <CircularProgress style={{ display: question?"none":"block", margin: "20px auto" }} />
+                {(question && edit)?<Ask id={props.match.params.id} update={true} question={question.question.title} description={question.question.desc} tags={question.question.tags} />:""}
                 <Typography variant="h4" gutterBottom className={classes.heading}>{question?question.question.title:""}</Typography>
                 <Markdown source={question?question.question.desc:""} renderers={{image: Image, code: Code, link: RouterLink}} />
                 {question?Object.values(question.question.tags).map(tag => (
-                    <Chip label={tag} variant="outlined" className={classes.tags} />
+                    <Link href={"/s/"+tag}>
+                        <Chip label={tag} variant="outlined" className={classes.tags} />
+                    </Link>
                 )):""}
-                {question?<Chip label={timeSince(question.question.updated_at) + " ago"} variant="outlined" className={classes.tags} style={{ backgroundColor: "lightgrey" }} />:""}
-                {(question && question.question.user==me)?(<IconButton aria-label="delete" onClick={deleteQuestion}><DeleteIcon /></IconButton>):""}
+                {question?<Chip label={timeSince(question.question.updated_at) + " ago"} variant="outlined" className={classes.tags} style={{ backgroundColor: "lightgrey", cursor: "default" }} />:""}
+                {(question && question.question.user==me)?(<span><IconButton aria-label="delete" onClick={deleteQuestion}><DeleteIcon /></IconButton><IconButton aria-label="Edit" onClick={() => setedit(!edit)}><EditIcon /></IconButton></span>):""}
                 {question?(
                     <Paper elevation={3} variant="outlined" className={classes.user}>
                         <Grid container>
                             <Grid item xs={4}>
-                                <Avatar alt="User Avatar" src={"https://avatars.dicebear.com/api/male/"+question.question.user+".png"} className={classes.avatar} />
+                                <Avatar alt="User Avatar" src={"https://avatars.dicebear.com/api/male/"+question.question.user+".svg"} className={classes.avatar} />
                             </Grid>
                             <Grid xs className={classes.username}>
                                 <Link href={"/u/"+question.question.user} className={classes.link}>{question.question.user}</Link>
@@ -192,7 +200,7 @@ export default function Question(props) {
                 <IconButton style={{ margin: 0 }}>
                     {question?question.sum_rating:""}
                 </IconButton>
-                <IconButton className={classes.arrow} onClick={() => voter.dowvoteQuestion(question?question.question.id:"")}>
+                <IconButton className={classes.arrow} onClick={() => voter.downvoteQuestion(question?question.question.id:"")}>
                     <ArrowDropDownIcon fontSize="large" /> 
                 </IconButton>
             </Grid>

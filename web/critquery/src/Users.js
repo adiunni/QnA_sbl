@@ -82,7 +82,7 @@ export default function Users(props) {
                             <Grid item xs={12}>
                                 <Toolbar>
                                     <Paper elevation={3} variant="outlined" style={{ margin: 15 }}>
-                                        <img alt={u.username} src={"https://avatars.dicebear.com/api/male/"+u.username+".png"} className={classes.avatar} />
+                                        <img alt={u.username} src={"https://avatars.dicebear.com/api/male/"+u.username+".svg"} className={classes.avatar} />
                                     </Paper>
                                     <Link href={"/u/"+u.username}>
                                         <Typography variant="h5">

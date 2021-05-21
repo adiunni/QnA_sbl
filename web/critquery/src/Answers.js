@@ -139,7 +139,7 @@ export default function Answers(props) {
         </Toolbar>
         <List className={classes.list}>
             {Object.values(props.answers).map(a => (
-                <ListItem>
+                <ListItem id={a.id}>
                     <Paper elevation={3} variant="outlined" className={classes.container}>
                         <Grid container spacing={3} className={classes.body}>
                             <Grid item xs={10}>
@@ -149,7 +149,7 @@ export default function Answers(props) {
                                 <Paper elevation={3} variant="outlined" className={classes.user}>
                                     <Grid container>
                                         <Grid item xs={4}>
-                                            <Avatar alt="User Avatar" src={"https://avatars.dicebear.com/api/male/"+a.answer.user+".png"} className={classes.avatar} />
+                                            <Avatar alt="User Avatar" src={"https://avatars.dicebear.com/api/male/"+a.answer.user+".svg"} className={classes.avatar} />
                                         </Grid>
                                         <Grid xs className={classes.username}>
                                             <Link href={"/u/"+a.answer.user} className={classes.link}>{a.answer.user}</Link>

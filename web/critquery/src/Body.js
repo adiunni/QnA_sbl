@@ -18,6 +18,7 @@ import User from './User';
 import Login from './Login';
 import Users from './Users';
 import Search from './Search';
+import Settings from './Settings';
 
 const useStyles = makeStyles((theme) => ({
     body: {
@@ -77,6 +78,7 @@ export default function Body() {
                     <Route path="/login" component={Login} />
                     <Route path="/ask" component={Ask} />
                     <Route path="/users" component={Users} />
+                    <Route path="/settings" component={Settings} />
                     <Route path="/" component={Questions} />
                 </Switch>
             </Router>
